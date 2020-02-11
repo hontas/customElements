@@ -18,7 +18,7 @@
       *,
       *:before,
       *:after {
-        box-sizing: inherit;
+        box-sizing: border-box;
       }
 
       .wrapper {
@@ -103,20 +103,23 @@
     </intersection-observer>
 
     <!-- no-resize open min-content-height="34" -->
-    <x-dialog open>
-      <article>
-        <header style="background: whitesmoke; display: flex; justify-content: space-between; align-items: center;">
-          <button
-            rel="close"
-            type="button"
-            style="border: none; background: transparent; font-size: 1em; align-self: stretch; padding: 0 0.5em;"
-          >
-            <span style="display: block; transform: rotate(45deg);">✛</span>
-          </button>
-          <h4 style="margin: 0; padding: 0.5em 0;">heading</h4>
-          <span></span>
-        </header>
-        <main style="background: white; padding: 1rem;">
+    <x-dialog minimize>
+      <header
+        slot="header"
+        style="background: whitesmoke; display: flex; justify-content: space-between; align-items: center;"
+      >
+        <button
+          rel="close"
+          type="button"
+          style="border: none; background: transparent; font-size: 1em; align-self: stretch; padding: 0 0.5em;"
+        >
+          <span style="display: block; transform: rotate(45deg);">✛</span>
+        </button>
+        <h4 style="margin: 0; padding: 0.5em 0;">heading</h4>
+        <span></span>
+      </header>
+      <main style="background: white; padding: 1rem; display: grid;">
+        <div>
           <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut viverra lacinia lacus. Cras eu nisi non magna
             sodales pretium ac et metus. Pellentesque tristique nisl in semper elementum. Etiam sed luctus tellus. Cras
@@ -130,12 +133,18 @@
             tortor sit amet, sollicitudin viverra turpis. Proin at sagittis sapien. Ut molestie condimentum sem. Nam
             iaculis, dolor mattis elementum luctus, elit arcu iaculis ipsum, nec iaculis sem purus vel neque. Donec et
             metus tempus, gravida odio luctus, semper leo. Proin et mollis sapien. Suspendisse quam purus, sodales id
-            facilisis sed, sodales eu urna. Aliquam id leo convallis, consectetur massa id, finibus elit. Aliquam
-            pretium, diam a pretium efficitur, nunc ligula pulvinar lectus, eu varius odio velit ut arcu. Pellentesque
-            mattis magna in vehicula pretium.
-          </>
-        </main>
-      </article>
+            facilisis sed, sodales eu urna.
+          </p>
+        </div>
+        <div style="align-self: end;">
+          <button
+            type="button"
+            style="display: block; width: 100%; border: 1px solid darkred; background: red; color: white; padding: 0.5em 1em;"
+          >
+            just dü it
+          </button>
+        </div>
+      </main>
     </x-dialog>
 
     <script>
@@ -145,9 +154,11 @@
       const dialog = document.querySelector('x-dialog');
       const closeBtn = dialog.querySelector('[rel=close]');
 
-
       btn.addEventListener('click', () => dialog.setAttribute('open', ''));
-      closeBtn.addEventListener('click', () => dialog.removeAttribute('open'))
+      closeBtn.addEventListener('click', () => {
+        console.log('close');
+        dialog.removeAttribute('open');
+      });
 
       const cleanHTML = (str) =>
         str.replace(/<(\/)?script([^>]*)>/gi, (m, endTag = '', attrs = '') => `&lt;${endTag}script${attrs}&gt;`);
