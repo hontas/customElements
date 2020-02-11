@@ -1,0 +1,102 @@
+:host {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  pointer-events: none;
+}
+
+.Dialog__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.3s;
+  transition-delay: 0.15s;
+
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.Dialog__content {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  transition: opacity 0.3s, transform 0.3s;
+  transform: translateY(var(--Dialog-offset-y, 0));
+
+  opacity: 0;
+  pointer-events: none;
+}
+
+.Dialog--open .Dialog__overlay,
+.Dialog--open .Dialog__content {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.Dialog--open .Dialog__content {
+  transition-delay: 0.15s;
+}
+
+.Dialog__drag-handle {
+  color: rgba(255, 255, 255, 0.75);
+  cursor: grab;
+  position: absolute;
+  top: -1.5rem;
+  left: 0;
+  height: 1.5rem;
+  width: 100%;
+  text-align: center;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.Dialog__drag-icon {
+  display: inline-block;
+  width: 16px;
+  height: 8px;
+}
+
+.Dialog__drag-icon,
+.Dialog__drag-icon::before {
+  background-image: radial-gradient(currentColor 40%, transparent 40%);
+  background-size: 4px 4px;
+  background-position: 0 100%;
+  background-repeat: repeat-x;
+}
+
+.Dialog__drag-icon::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 33%;
+}
+
+.Dialog--dragging .Dialog__drag-handle {
+  cursor: grabbing;
+}
+.Dialog--dragging .Dialog__content {
+  transition: none;
+}
+
+.Dialog--inactive .Dialog__overlay {
+  opacity: 0;
+  pointer-events: none;
+}
+.Dialog--inactive .Dialog__content {
+  box-shadow: 0 -0.5em 1em rgba(0, 0, 0, 0.2);
+}
+.Dialog--inactive .Dialog__drag-handle {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.Dialog--no-resize .Dialog__drag-handle {
+  display: none;
+}

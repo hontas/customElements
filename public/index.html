@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Custom Elements</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        box-sizing: border-box;
+        font-family: system-ui, Helvetica Neue, sans-serif;
+      }
+
+      *,
+      *:before,
+      *:after {
+        box-sizing: inherit;
+      }
+
+      .wrapper {
+        display: flex;
+        height: 80%;
+        border-bottom: 1px solid grey;
+      }
+
+      textarea {
+        background: lightgray;
+        border: none;
+        border-right: 1px solid grey;
+        color: gray;
+        font-size: 0.875em;
+        resize: none;
+      }
+      textarea:focus {
+        outline: none;
+        background: whitesmoke;
+        color: #333;
+      }
+
+      .wrapper > textarea,
+      .wrapper > rich-text {
+        flex: 1;
+        height: 100%;
+        padding: 0.5em;
+      }
+
+      #open-dialog {
+        margin: 10% 0;
+        font-size: 1em;
+        padding: 0.5em 1em;
+      }
+
+      .readyToIntersect {
+        width: 100vw;
+        height: 3rem;
+        background: teal;
+        transition: background 1s;
+      }
+      .readyToIntersect:after {
+        color: white;
+        content: 'waiting to intersect';
+      }
+
+      .readyToIntersect.is-intersecting {
+        background: coral;
+      }
+      .readyToIntersect.is-intersecting:after {
+        content: 'intersected!';
+      }
+    </style>
+    <script src="./bundle.js" type="module"></script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <textarea>
+<h1>Heading</h1>
+<p>paragraph</p>
+<ul>
+  <li>unordered list</li>
+    <ul>
+      <li>List in a list</li>
+    </ul>
+</ul>
+<ol>
+  <li>ordered list</li>
+</ol>
+<a href="/">Link</a>
+      </textarea>
+
+      <rich-text>
+        <p>rich-text</p>
+      </rich-text>
+    </div>
+
+    <button id="open-dialog" type="button">open dialog</button>
+
+    <intersection-observer>
+      <div class="readyToIntersect"></div>
+    </intersection-observer>
+
+    <!-- no-resize open min-content-height="34" -->
+    <x-dialog open>
+      <article>
+        <header style="background: whitesmoke; display: flex; justify-content: space-between; align-items: center;">
+          <button
+            rel="close"
+            type="button"
+            style="border: none; background: transparent; font-size: 1em; align-self: stretch; padding: 0 0.5em;"
+          >
+            <span style="display: block; transform: rotate(45deg);">✛</span>
+          </button>
+          <h4 style="margin: 0; padding: 0.5em 0;">heading</h4>
+          <span></span>
+        </header>
+        <main style="background: white; padding: 1rem;">
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut viverra lacinia lacus. Cras eu nisi non magna
+            sodales pretium ac et metus. Pellentesque tristique nisl in semper elementum. Etiam sed luctus tellus. Cras
+            consectetur tempor metus sed facilisis. Ut dui orci, lacinia non lectus sit amet, sollicitudin ornare quam.
+            Nunc sit amet justo pellentesque, tempus ex eget, blandit leo. Aliquam non placerat risus. Vestibulum
+            consequat sollicitudin augue sed viverra. Curabitur tincidunt non orci sit amet sollicitudin.
+          </p>
+          <p>
+            Phasellus sagittis tristique erat at auctor. In hac habitasse platea dictumst. Curabitur ut mauris magna.
+            Maecenas sollicitudin lacus eu odio aliquet mollis. Fusce sit amet mattis ex. Sed diam ligula, porttitor id
+            tortor sit amet, sollicitudin viverra turpis. Proin at sagittis sapien. Ut molestie condimentum sem. Nam
+            iaculis, dolor mattis elementum luctus, elit arcu iaculis ipsum, nec iaculis sem purus vel neque. Donec et
+            metus tempus, gravida odio luctus, semper leo. Proin et mollis sapien. Suspendisse quam purus, sodales id
+            facilisis sed, sodales eu urna. Aliquam id leo convallis, consectetur massa id, finibus elit. Aliquam
+            pretium, diam a pretium efficitur, nunc ligula pulvinar lectus, eu varius odio velit ut arcu. Pellentesque
+            mattis magna in vehicula pretium.
+          </>
+        </main>
+      </article>
+    </x-dialog>
+
+    <script>
+      const txt = document.querySelector('textarea');
+      const r = document.querySelector('rich-text');
+      const btn = document.querySelector('#open-dialog');
+      const dialog = document.querySelector('x-dialog');
+      const closeBtn = dialog.querySelector('[rel=close]');
+
+
+      btn.addEventListener('click', () => dialog.setAttribute('open', ''));
+      closeBtn.addEventListener('click', () => dialog.removeAttribute('open'))
+
+      const cleanHTML = (str) =>
+        str.replace(/<(\/)?script([^>]*)>/gi, (m, endTag = '', attrs = '') => `&lt;${endTag}script${attrs}&gt;`);
+
+      window.addEventListener('DOMContentLoaded', () => {
+        r.innerHTML = cleanHTML(txt.value);
+      });
+
+      let timeoutId;
+      txt.addEventListener('keydown', (evt) => {
+        if (evt.key === 'Tab') {
+          evt.preventDefault();
+          // indent/deindent code
+          const start = txt.selectionStart;
+          const end = txt.selectionEnd;
+          const value = txt.value;
+          let delta = 1;
+
+          if (evt.shiftKey) {
+            const prevChar = value.slice(start - 1, start);
+            if (prevChar === '\n') return;
+            delta = prevChar === '\t' ? -1 : -2; // tab or spaces
+            txt.value = `${value.slice(0, start + delta)}${value.slice(start, end)}${value.slice(end)}`;
+          } else {
+            txt.value = `${value.slice(0, start)}\t${value.slice(start, end)}${value.slice(end)}`;
+          }
+          txt.selectionStart = start + delta;
+          txt.selectionEnd = end + delta;
+          return;
+        }
+      });
+      txt.addEventListener('input', (evt) => {
+        clearTimeout(timeoutId);
+        const value = evt.target.value;
+        timeoutId = setTimeout(() => {
+          r.innerHTML = cleanHTML(value);
+        }, 500);
+      });
+    </script>
+  </body>
+</html>
